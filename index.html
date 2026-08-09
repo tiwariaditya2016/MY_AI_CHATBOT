@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI_CHATBOT</title>
+    
+    <!-- Single Google Fonts link that loads ALL Material Symbols Rounded icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+    
+    <!-- Fixed typo: "stylesheet" instead of "stylesheets" -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header">
+        <h2 class="title">Hello there</h2>
+        <h4 class="subtitle">How can I help you today?</h4>
+        <ul class="suggestion_list">
+            <li class="suggestion">
+                <h4 class="text">Help me plan a game night with my 5 best friends for under $100</h4>
+                <span class="icon material-symbols-rounded">draw</span>
+            </li>
+            <li class="suggestion">
+                <h4 class="text">What are the best tips to improve my public speaking skills?</h4>
+                <span class="icon material-symbols-rounded">lightbulb</span>
+            </li>
+            <li class="suggestion">
+                <h4 class="text">What type of programming language is brainfuck?</h4>
+                <span class="icon material-symbols-rounded">explore</span>
+            </li>
+            <li class="suggestion">
+                <h4 class="text">Write JavaScript code to sum up all the elements of an array?</h4>
+                <span class="icon material-symbols-rounded">draw</span>
+            </li>
+        </ul>
+    </div>
+    <div class="chat-list"></div>
+    <div class="typing-area">
+        <form action="#" class="typing-form">
+            <div class="input-wrapper">
+                <input type="text" class="typing-input" placeholder="Enter a prompt here" required>
+                <button type="submit" class="icon">
+                    <span class="icon material-symbols-rounded">send</span>
+                </button>
+            </div>
+      
+            <div class="action-buttons">
+                <span class="icon material-symbols-rounded">light_mode</span>
+                <span class="icon material-symbols-rounded">delete</span>
+            </div>
+        </form>
+        <p class="disclamer-text">
+            Gemini may display inaccurate info,including about people, so double
+            check its responses.
+        </p>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
