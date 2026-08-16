@@ -1,13 +1,35 @@
 const typingForm = document.querySelector('.typing-form');
 const chatList = document.querySelector('.chat-list');
+const toggleThemeButton = document.querySelector('#toggle-theme-button');
+
 let userMessage = null;
-const API_KEY=`ENTER_YOUR_API_KEY`;
+
+const API_KEY=`enter your API_KEY here`;
 const API_URL="https://generativelanguage.googleapis.com/v1beta/interactions";
+
+const loadLocalStorageData = ()=>{
+
+}
 const createMessageElement = (content ,...classes)=>{
     const div = document.createElement('div');
     div.classList.add("message",...classes);
     div.innerHTML = content;
     return div;
+}
+const showTypingEffect = (text , textElement)=>{
+    textElement.innerText = '';
+    const words = text.split(' ');
+    let currentWordIndex = 0;
+
+    const typingInterval = setInterval(()=>{
+        textElement.innerText += (currentWordIndex === 0 ? '':' ') + words[currentWordIndex++];
+
+        if(currentWordIndex === words.length){
+            clearInterval(typingInterval);
+        }
+
+    },75);
+   
 }
 const generateAPIresponses = async(incomingMessageDiv)=>{
     const textElement = incomingMessageDiv.querySelector(".text");
@@ -23,8 +45,7 @@ const generateAPIresponses = async(incomingMessageDiv)=>{
         });
         const data = await response.json();
         const apiResponse = data?.steps[1].content[0].text;
-        textElement.innerText=apiResponse;
-       
+        showTypingEffect(apiResponse ,textElement);
     }catch(error){
         console.log(error);
     }finally{
@@ -63,9 +84,14 @@ const handleOutgoingChat = () =>{
 
     typingForm.reset();
     setTimeout(showLoadingAnimation , 500);
-
-
 }
+
+toggleThemeButton.addEventListener('click' , ()=>{
+    const isLightMode = document.body.classList.toggle('light-mode');
+    localStorage.setItem("themeColor", isLightMode ? "light_mode" : "dark_mode");  
+    toggleThemeButton.innerText = isLightMode ? "dark_mode" : "light_mode"
+});
+
 typingForm.addEventListener('submit' ,(e) =>{
     e.preventDefault();
 
