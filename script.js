@@ -5,7 +5,7 @@ const deleteChatButton = document.querySelector('#delete-chat-button');
 
 let userMessage = null;
 
-const API_KEY=`ENTER_YOUR_API_KEY`;
+const API_KEY=`ENTER_YOUR_API`;
 const API_URL="https://generativelanguage.googleapis.com/v1beta/interactions";
 
 const loadLocalStorageData = ()=>{
