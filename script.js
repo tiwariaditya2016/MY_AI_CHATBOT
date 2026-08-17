@@ -1,15 +1,27 @@
 const typingForm = document.querySelector('.typing-form');
 const chatList = document.querySelector('.chat-list');
 const toggleThemeButton = document.querySelector('#toggle-theme-button');
+const deleteChatButton = document.querySelector('#delete-chat-button');
 
 let userMessage = null;
 
-const API_KEY=`enter your API_KEY here`;
+const API_KEY=`ENTER_YOUR_API_KEY`;
 const API_URL="https://generativelanguage.googleapis.com/v1beta/interactions";
 
 const loadLocalStorageData = ()=>{
+    const isLightMode = (localStorage.getItem("themeColor") === "light_mode");
+    
+    document.body.classList.toggle("light-mode" , isLightMode);
+    toggleThemeButton.innerText = isLightMode ? "dark_mode" : "light_mode";
 
+    const savedChats = localStorage.getItem("savedChats");
+    if (savedChats) {
+        chatList.innerHTML = savedChats;
+    }
 }
+
+loadLocalStorageData();
+
 const createMessageElement = (content ,...classes)=>{
     const div = document.createElement('div');
     div.classList.add("message",...classes);
@@ -26,6 +38,7 @@ const showTypingEffect = (text , textElement)=>{
 
         if(currentWordIndex === words.length){
             clearInterval(typingInterval);
+            localStorage.setItem("savedChats" , chatList.innerHTML); //save chats to local storage
         }
 
     },75);
@@ -89,7 +102,16 @@ const handleOutgoingChat = () =>{
 toggleThemeButton.addEventListener('click' , ()=>{
     const isLightMode = document.body.classList.toggle('light-mode');
     localStorage.setItem("themeColor", isLightMode ? "light_mode" : "dark_mode");  
-    toggleThemeButton.innerText = isLightMode ? "dark_mode" : "light_mode"
+    toggleThemeButton.innerText = isLightMode ? "dark_mode" : "light_mode";
+   
+});
+
+deleteChatButton.addEventListener('click' , ()=>{
+    if(confirm("Are you sure you want to delete all chats?")){
+        localStorage.removeItem("savedChats");
+        chatList.innerHTML = '';
+    }
+  
 });
 
 typingForm.addEventListener('submit' ,(e) =>{
