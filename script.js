@@ -1,11 +1,13 @@
 const typingForm = document.querySelector('.typing-form');
 const chatList = document.querySelector('.chat-list');
+const suggestions = document.querySelectorAll(".suggestion_list .suggestion");
 const toggleThemeButton = document.querySelector('#toggle-theme-button');
 const deleteChatButton = document.querySelector('#delete-chat-button');
 
 let userMessage = null;
+let isResponseGenerating = false;
 
-const API_KEY=`ENTER_YOUR_API`;
+const API_KEY=`ENTER_YOUR_API_KEY`;
 const API_URL="https://generativelanguage.googleapis.com/v1beta/interactions";
 
 const loadLocalStorageData = ()=>{
@@ -18,6 +20,7 @@ const loadLocalStorageData = ()=>{
     if (savedChats) {
         chatList.innerHTML = savedChats;
     }
+    document.body.classList.toggle("hide-header" , savedChats);
 }
 
 loadLocalStorageData();
@@ -38,6 +41,7 @@ const showTypingEffect = (text , textElement)=>{
 
         if(currentWordIndex === words.length){
             clearInterval(typingInterval);
+            isResponseGenerating = false;
             localStorage.setItem("savedChats" , chatList.innerHTML); //save chats to local storage
         }
 
@@ -57,10 +61,13 @@ const generateAPIresponses = async(incomingMessageDiv)=>{
 
         });
         const data = await response.json();
+        if(!response.ok) throw new Error(data.error.message);
         const apiResponse = data?.steps[1].content[0].text;
         showTypingEffect(apiResponse ,textElement);
     }catch(error){
-        console.log(error);
+        isResponseGenerating = false;
+        textElement.innerText = error.message;
+        textElement.classList.add("error");
     }finally{
         incomingMessageDiv.classList.remove("loading");
     }
@@ -76,17 +83,26 @@ const showLoadingAnimation = ()=>{
                     <div class="loading-bar"></div>
                 </div>
             </div>
-            <span class="icon material-symbols-rounded">content_copy</span>`;
+            <span onclick="copyMessage(this)" class="icon material-symbols-rounded">content_copy</span>`;
     const incomingMessageDiv = createMessageElement(html ,'incoming' ,'loading');
     
     chatList.appendChild(incomingMessageDiv);
     generateAPIresponses(incomingMessageDiv);
-
-
 }
+
+const copyMessage = (copyIcon) =>{
+    const messageText = copyIcon.parentElement.querySelector(".text").innerText;
+
+    navigator.clipboard.writeText(messageText);
+    copyIcon.innerText = "done" ; //show tick icon
+    setTimeout(()=> copyIcon.innerText = "content_copy" , 1000); //revert icon after 1 sec
+}
+
 const handleOutgoingChat = () =>{
-    userMessage = typingForm.querySelector('.typing-input').value.trim();
-    if(!userMessage) return;
+    userMessage = typingForm.querySelector('.typing-input').value.trim() || userMessage;
+    if(!userMessage || isResponseGenerating) return;
+
+    isResponseGenerating = true;
     const html = `<div class="message-content">
                 <img src="photo.jpeg" alt="user image" class="avatar">
                 <p class="text"></p>
@@ -96,9 +112,16 @@ const handleOutgoingChat = () =>{
     chatList.appendChild(outgoingMessageDiv);
 
     typingForm.reset();
-    setTimeout(showLoadingAnimation , 500);
+    document.body.classList.add("hide-header"); //hide the header once the chat start
+    setTimeout(showLoadingAnimation , 500); //show loading animation after a delay
 }
-
+//set user message and handle outgoing chat when a suggestion is clicked
+suggestions.forEach(suggestion =>{
+    suggestion.addEventListener("click" , ()=>{
+        userMessage = suggestion.querySelector(".text").innerText;
+        handleOutgoingChat();
+    });
+});
 toggleThemeButton.addEventListener('click' , ()=>{
     const isLightMode = document.body.classList.toggle('light-mode');
     localStorage.setItem("themeColor", isLightMode ? "light_mode" : "dark_mode");  
@@ -110,6 +133,7 @@ deleteChatButton.addEventListener('click' , ()=>{
     if(confirm("Are you sure you want to delete all chats?")){
         localStorage.removeItem("savedChats");
         chatList.innerHTML = '';
+        document.body.classList.remove("hide-header"); //shows header and suggestion again
     }
   
 });
